@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "Ship" ADD COLUMN     "beam" DOUBLE PRECISION,
+ADD COLUMN     "draft" DOUBLE PRECISION,
+ADD COLUMN     "enginePower" DOUBLE PRECISION,
+ADD COLUMN     "hullThickness" DOUBLE PRECISION,
+ADD COLUMN     "iceBreakerBow" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "iceClass" TEXT,
+ADD COLUMN     "iceThickness" DOUBLE PRECISION,
+ADD COLUMN     "length" DOUBLE PRECISION;

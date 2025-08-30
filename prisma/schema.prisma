@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // uses connection pooling
+}
+
+model User {
+  id         String  @id @default(uuid())
+  email      String  @unique
+  firstName  String?
+  middleName String?
+  lastName   String?
+  password   String
+  role       Role    @default(USER)
+  ships      Ship[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model ShipType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  code String @unique
+  Ship Ship[]
+}
+
+model Ship {
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String
+  type          ShipType  @relation(fields: [shipTypeId], references: [id])
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  shipTypeId    Int
+  length        Float?
+  beam          Float?
+  draft         Float?
+  hullThickness Float?
+  enginePower   Float?
+  iceBreakerBow Boolean   @default(false)
+  iceThickness  Float?
+  iceClass      String?
+  material      String?
+  sections      Section[]
+}
+
+model Section {
+  id            Int    @id @default(autoincrement())
+  shipId        Int
+  name          String
+  area          Float? // Площадь сечения
+  momentInertia Float? // Момент инерции
+  length        Float? // Длина сечения
+  beam          Float? // Ширина сечения
+
+  ship    Ship                @relation(fields: [shipId], references: [id])
+  loads   Load[]
+  results CalculationResult[]
+}
+
+enum LoadType {
+  BENDING
+  SHEAR
+  AXIAL
+}
+
+enum ShipTypeEnum {
+  DRY_CARGO // dry_cargo
+  TANKER // tanker
+  LNG_CARRIER // lng_carrier
+  RO_RO // ro_ro
+  PASSENGER // passenger
+  ICEBREAKER // icebreaker
+  HEAVY_LIFT // heavy_lift
+}
+
+model Load {
+  id        Int      @id @default(autoincrement())
+  sectionId Int
+  type      LoadType
+  value     Float
+  section   Section  @relation(fields: [sectionId], references: [id])
+}
+
+model CalculationResult {
+  id            Int      @id @default(autoincrement())
+  sectionId     Int
+  bendingStress Float?
+  shearStress   Float?
+  axialStress   Float?
+  deflection    Float?
+  createdAt     DateTime @default(now())
+  section       Section  @relation(fields: [sectionId], references: [id])
+}
