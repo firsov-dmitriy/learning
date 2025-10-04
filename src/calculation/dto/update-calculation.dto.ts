@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateCalculationDto } from './create-calculation.dto';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateSectionDto } from './create-calculation.dto';
 
-export class UpdateCalculationDto extends PartialType(CreateCalculationDto) {}
+export class UpdateSectionDto extends PartialType(CreateSectionDto) {}

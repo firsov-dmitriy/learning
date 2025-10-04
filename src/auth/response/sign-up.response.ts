@@ -1,10 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MetaDto } from '../../types/DataType';
 
-export enum Role {
-  ADMIN = 'ADMIN',
-  USER = 'USER',
-}
 class SignUpResponseData {
   @ApiProperty({ type: String, example: 'Name' })
   public firstName?: string;
@@ -20,9 +16,6 @@ class SignUpResponseData {
 
   @ApiProperty()
   public password: string;
-
-  @ApiProperty({ enum: [Role.USER, Role.ADMIN], enumName: 'Role' })
-  public role?: Role;
 
   @ApiProperty()
   public accessToken: string;

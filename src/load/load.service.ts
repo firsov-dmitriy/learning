@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateLoadDto } from './dto/create-load.dto';
 import { UpdateLoadDto } from './dto/update-load.dto';
 
 @Injectable()
 export class LoadService {
-  create(createLoadDto: CreateLoadDto) {
-    return 'This action adds a new load';
+  constructor(private prisma: PrismaService) {}
+
+  async create(sectionId: number, createLoadDto: CreateLoadDto) {
+    return this.prisma.load.create({
+      data: { ...createLoadDto, sectionId },
+    });
   }
 
-  findAll() {
-    return `This action returns all load`;
+  async findAll(sectionId?: number) {
+    return this.prisma.load.findMany({
+      where: sectionId ? { sectionId } : undefined,
+      include: { section: true },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} load`;
+  async findOne(id: number) {
+    const load = await this.prisma.load.findUnique({
+      where: { id },
+      include: { section: true },
+    });
+    if (!load) throw new NotFoundException(`Load with id ${id} not found`);
+    return load;
   }
 
-  update(id: number, updateLoadDto: UpdateLoadDto) {
-    return `This action updates a #${id} load`;
+  async update(id: number, updateLoadDto: UpdateLoadDto) {
+    const load = await this.prisma.load.findUnique({ where: { id } });
+    if (!load) throw new NotFoundException(`Load with id ${id} not found`);
+    return this.prisma.load.update({
+      where: { id },
+      data: updateLoadDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} load`;
+  async remove(id: number) {
+    const load = await this.prisma.load.findUnique({ where: { id } });
+    if (!load) throw new NotFoundException(`Load with id ${id} not found`);
+    return this.prisma.load.delete({ where: { id } });
   }
 }

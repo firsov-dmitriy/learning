@@ -15,19 +15,15 @@ datasource db {
 }
 
 model User {
-  id         String  @id @default(uuid())
-  email      String  @unique
-  firstName  String?
-  middleName String?
-  lastName   String?
-  password   String
-  role       Role    @default(USER)
-  ships      Ship[]
-}
-
-enum Role {
-  USER
-  ADMIN
+  id           String  @id @default(uuid())
+  email        String  @unique
+  firstName    String?
+  middleName   String?
+  lastName     String?
+  password     String
+  ships        Ship[]
+  isActive     Boolean @default(false)
+  confirmToken String?
 }
 
 model ShipType {
@@ -52,29 +48,35 @@ model Ship {
   enginePower   Float?
   iceBreakerBow Boolean   @default(false)
   iceThickness  Float?
-  iceClass      String?
+  iceClass      IceClass? // ✅ теперь enum вместо строки
   material      String?
   sections      Section[]
 }
 
 model Section {
-  id            Int    @id @default(autoincrement())
+  id            Int                 @id @default(autoincrement())
   shipId        Int
   name          String
   area          Float? // Площадь сечения
   momentInertia Float? // Момент инерции
   length        Float? // Длина сечения
   beam          Float? // Ширина сечения
-
-  ship    Ship                @relation(fields: [shipId], references: [id])
-  loads   Load[]
-  results CalculationResult[]
+  ship          Ship                @relation(fields: [shipId], references: [id])
+  loads         Load[]
+  results       CalculationResult[]
 }
 
 enum LoadType {
   BENDING
   SHEAR
   AXIAL
+}
+
+enum IceClass {
+  LU1
+  LU2
+  LU3
+  ARC4
 }
 
 enum ShipTypeEnum {

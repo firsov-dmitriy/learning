@@ -24,7 +24,8 @@ export class CreateShipDto {
 
   @ApiProperty({ description: 'ID пользователя, создавшего судно' })
   @IsString()
-  userId: string;
+  @IsOptional()
+  userId?: string;
 
   @ApiProperty({ description: 'Длина судна, м', required: false, default: 0 })
   @IsNumber()
@@ -83,6 +84,7 @@ export class CreateShipDto {
     enum: IceTypeEnum,
   })
   @IsEnum(IceTypeEnum)
+  @IsOptional()
   iceClass?: IceTypeEnum;
 
   @IsOptional()

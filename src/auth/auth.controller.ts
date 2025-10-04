@@ -8,6 +8,7 @@ import {
   Req,
   UseGuards,
   Res,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response, Request } from 'express';
@@ -18,7 +19,6 @@ import {
 } from './dto/reset-password-auth';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import {
-  ApiBadRequestResponse,
   ApiOkResponse,
   ApiResponse,
   ApiTags,
@@ -118,5 +118,10 @@ export class AuthController {
     @Body() resetPasswordConfirmedDto: ResetPasswordConfirmAuth,
   ) {
     return this.authService.resetPasswordConfirm(resetPasswordConfirmedDto);
+  }
+  @Public()
+  @Get('confirm')
+  async confirmEmail(@Query('token') token: string) {
+    return this.authService.confirmEmail(token);
   }
 }

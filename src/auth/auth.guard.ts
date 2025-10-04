@@ -40,7 +40,6 @@ export class AuthGuard implements CanActivate {
           firstName: true,
           lastName: true,
           middleName: true,
-          role: true,
         },
       });
 

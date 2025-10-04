@@ -1,29 +1,33 @@
-import { Controller, Get, Post, Param } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body } from '@nestjs/common';
 import { CalculationService } from './calculation.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CalculateIceClassDto } from './dto/calculate-ice-class.dto';
+import { CalculateHullProfileDto } from './dto/calculate-hull-profile.dto';
 
 @ApiTags('Calculation')
 @Controller('calculations')
 export class CalculationController {
   constructor(private readonly calculationService: CalculationService) {}
 
-  @Post('ship/:shipId')
-  calculateShip(@Param('shipId') shipId: string) {
-    return this.calculationService.calculateShip(+shipId);
+  @Post('ice-class')
+  @ApiOperation({ summary: 'Расчёт ледового усилия по классу льда' })
+  @ApiResponse({
+    status: 200,
+    description: 'Возвращает рассчитанное ледовое усилие (кН)',
+  })
+  calculateIceForce(@Body() dto: CalculateIceClassDto) {
+    return this.calculationService.calculateIceClass(dto);
   }
-
-  @Post('section/:sectionId')
-  calculateSection(@Param('sectionId') sectionId: string) {
-    return this.calculationService.calculateSection(+sectionId);
-  }
-
-  @Get('ship/:shipId')
-  getShipResults(@Param('shipId') shipId: string) {
-    return this.calculationService.getShipResults(+shipId);
-  }
-
-  @Get('section/:sectionId')
-  getSectionResults(@Param('sectionId') sectionId: string) {
-    return this.calculationService.getSectionResults(+sectionId);
+  @Post('hull-profile')
+  @ApiOperation({
+    summary: 'Расчёт профиля толщины корпуса судна по ледовому усилию',
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Возвращает профиль корпуса с толщинами в см вдоль длины судна',
+  })
+  calculateHullThicknessProfile(@Body() dto: CalculateHullProfileDto) {
+    return this.calculationService.calculateHullThicknessProfile(dto);
   }
 }

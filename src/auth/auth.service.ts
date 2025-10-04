@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { randomBytes } from 'crypto';
 
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import {
@@ -25,6 +26,7 @@ import { TokenService } from './token.service';
 import { Request } from 'express';
 import { JwtPayload } from '../types/JwtPayload';
 import { ErrorCode } from './response/successResponse';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +36,7 @@ export class AuthService {
     private jwtService: JwtService,
     private prisma: PrismaService,
     private tokenService: TokenService,
+    private mailerService: MailerService,
   ) {}
 
   async register(registerAuthDto: RegisterAuthDto) {
@@ -46,20 +49,25 @@ export class AuthService {
 
     const hashedPassword = await this.cryptPassword(registerAuthDto.password);
 
+    const confirmToken = randomBytes(32).toString('hex');
+
     const createdUser = await this.prisma.user.create({
       data: {
         ...registerAuthDto,
         password: hashedPassword,
+        confirmToken,
+        isActive: false,
       },
       select: {
         email: true,
         firstName: true,
         lastName: true,
         middleName: true,
-        role: true,
         id: true,
       },
     });
+
+    await this.sendConfirmationEmail(createdUser.email, confirmToken);
 
     return createdUser;
   }
@@ -80,7 +88,7 @@ export class AuthService {
       );
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = { sub: user.id, email: user.email };
     const { accessToken, refreshToken } = await this.generateTokens(payload);
 
     this.tokenService.setAuthCookies(res, accessToken, refreshToken);
@@ -133,6 +141,29 @@ export class AuthService {
     });
   }
 
+  async confirmEmail(token: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { confirmToken: token },
+    });
+
+    if (!user) {
+      throw new HttpException(
+        'Неверный или устаревший токен',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isActive: true,
+        confirmToken: null,
+      },
+    });
+
+    return { message: 'Аккаунт успешно активирован!' };
+  }
+
   private async cryptPassword(password: string) {
     const salt = await genSalt();
     return hashSync(password, salt);
@@ -180,6 +211,16 @@ export class AuthService {
   private async hashEmail(email: string) {
     const salt = await genSalt();
     return hash(email, salt);
+  }
+
+  private async sendConfirmationEmail(email: string, token: string) {
+    const url = `${process.env.FRONTEND_URL}/auth/confirm?token=${token}`;
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Подтверждение аккаунта',
+      html: `<p>Для активации аккаунта перейдите по ссылке:</p>
+           <a href="${url}">${url}</a>`,
+    });
   }
 
   private async updateRestorePasswordHash(email: string, hashed: string) {

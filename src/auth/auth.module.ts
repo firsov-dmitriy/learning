@@ -9,7 +9,11 @@ import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
 import { TokenService } from './token.service';
 import { AuthGuard } from './auth.guard';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { ConfigService } from '@nestjs/config';
 
+console.log(process.env.MAIL_USER, process.env.MAIL_PASSWORD);
 @Module({
   controllers: [AuthController],
   providers: [
@@ -30,6 +34,17 @@ import { AuthGuard } from './auth.guard';
     }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     AuthModule,
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAIL_HOST,
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
+        },
+      },
+    }),
   ],
   exports: [TokenService, AuthService],
 })

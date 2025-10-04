@@ -17,7 +17,7 @@ export class ShipService {
     if (!user) throw new Error('User not found');
 
     const shipType = await this.prisma.shipType.findUnique({
-      where: { code: createShipDto.type }, // code должен быть уникальным в ShipType
+      where: { code: createShipDto.type },
     });
 
     if (!shipType) throw new Error('Ship type not found');
@@ -78,7 +78,6 @@ export class ShipService {
             firstName: true,
             middleName: true,
             lastName: true,
-            role: true,
           },
         },
         type: true,
@@ -97,7 +96,6 @@ export class ShipService {
             firstName: true,
             middleName: true,
             lastName: true,
-            role: true,
           },
         },
         type: true,
