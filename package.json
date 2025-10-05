@@ -36,6 +36,7 @@
     "@nestjs/swagger": "^6.3.0",
     "@prisma/client": "^6.0.1",
     "@vercel/blob": "^0.27.0",
+    "@vercel/node": "^5.3.24",
     "@vercel/postgres": "^0.10.0",
     "aws-sdk": "^2.1692.0",
     "bcrypt": "^5.1.0",
