@@ -1,10 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsOptional, Min, IsString } from 'class-validator';
+import { IsNumber, IsOptional, Min, IsEnum } from 'class-validator';
+import { IceClass } from '@prisma/client';
 
 export class CalculateHullProfileDto {
-  @ApiProperty({ example: 'LU3', description: 'Класс льда судна' })
-  @IsString()
-  iceClass: string;
+  @ApiProperty({ example: IceClass.LU3, description: 'Класс льда судна' })
+  @IsEnum(IceClass)
+  iceClass: IceClass;
+
+  @ApiProperty({ example: 120000, description: 'Ледовое усилие (кН)' })
+  @IsNumber()
+  @Min(0)
+  iceForce: number;
 
   @ApiProperty({ example: 120, description: 'Длина судна в метрах' })
   @IsNumber()

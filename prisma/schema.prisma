@@ -34,23 +34,24 @@ model ShipType {
 }
 
 model Ship {
-  id            Int       @id @default(autoincrement())
-  name          String
-  description   String
-  type          ShipType  @relation(fields: [shipTypeId], references: [id])
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  shipTypeId    Int
-  length        Float?
-  beam          Float?
-  draft         Float?
-  hullThickness Float?
-  enginePower   Float?
-  iceBreakerBow Boolean   @default(false)
-  iceThickness  Float?
-  iceClass      IceClass? // ✅ теперь enum вместо строки
-  material      String?
-  sections      Section[]
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  description           String
+  type                  ShipType                @relation(fields: [shipTypeId], references: [id])
+  userId                String
+  user                  User                    @relation(fields: [userId], references: [id])
+  shipTypeId            Int
+  length                Float?
+  beam                  Float?
+  draft                 Float?
+  hullThickness         Float?
+  enginePower           Float?
+  iceBreakerBow         Boolean                 @default(false)
+  iceThickness          Float?
+  iceClass              IceClass? // ✅ теперь enum вместо строки
+  material              String?
+  sections              Section[]
+  HullCalculationResult HullCalculationResult[]
 }
 
 model Section {
@@ -106,4 +107,23 @@ model CalculationResult {
   deflection    Float?
   createdAt     DateTime @default(now())
   section       Section  @relation(fields: [sectionId], references: [id])
+}
+
+model HullCalculationResult {
+  id        Int                @id @default(autoincrement())
+  shipId    Int                @unique
+  iceClass  IceClass
+  iceForce  Float
+  length    Float
+  createdAt DateTime           @default(now())
+  ship      Ship               @relation(fields: [shipId], references: [id])
+  points    HullProfilePoint[]
+}
+
+model HullProfilePoint {
+  id                      Int                   @id @default(autoincrement())
+  hullCalculationResultId Int
+  position                Float
+  thickness               Float
+  hullCalculationResult   HullCalculationResult @relation(fields: [hullCalculationResultId], references: [id])
 }
