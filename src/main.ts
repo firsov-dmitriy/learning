@@ -5,7 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import { AuthGuard } from './auth/auth.guard';
 import { PrismaService } from './prisma/prisma.service';
 import { TokenService } from './auth/token.service';
