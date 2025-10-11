@@ -34,7 +34,6 @@ export class ShipService {
   findAll(@Req() req: { user: JwtPayload }) {
     return this.prisma.user.findUnique({
       where: { email: req.user.email },
-
       select: {
         email: true,
         firstName: true,
